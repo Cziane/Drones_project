@@ -1,0 +1,12 @@
+/.AgentDead.java._trace
+/.AgentReady.java._trace
+/.BuildPerception.java._trace
+/.EnvironmentChanged.java._trace
+/.GUIWaiting.java._trace
+/.InfluenceEmited.java._trace
+/.InfluenceInvent.java._trace
+/.PerceptionEvent.java._trace
+/.ReadyToStart.java._trace
+/.StartSimulation.java._trace
+/.StopSimulation.java._trace
+/.WaitingForEnvironment.java._trace

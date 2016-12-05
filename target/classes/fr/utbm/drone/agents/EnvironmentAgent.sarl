@@ -1,0 +1,149 @@
+/**
+ * 
+ */
+package fr.utbm.drone.^agent
+
+import fr.utbm.drone.environment.DroneEnvironment
+import fr.utbm.drone.environment.ObjectType
+import fr.utbm.drone.environment.Percept
+import fr.utbm.drone.environment.motions.BehaviourOutput
+import fr.utbm.drone.environment.motions.MotionInfluence
+import fr.utbm.drone.events.AgentDead
+import fr.utbm.drone.events.InfluenceEmited
+import fr.utbm.drone.events.PerceptionEvent
+import fr.utbm.drone.events.ReadyToStart
+import fr.utbm.drone.events.StartSimulation
+import fr.utbm.drone.events.StopSimulation
+import fr.utbm.drone.time.TimePercept
+import fr.utbm.drone.util.AddressUUIDScope
+import io.sarl.core.Behaviors
+import io.sarl.core.DefaultContextInteractions
+import io.sarl.core.Initialize
+import io.sarl.core.Lifecycle
+import io.sarl.core.Schedules
+import io.sarl.lang.core.Address
+import io.sarl.util.OpenEventSpace
+import java.util.Random
+import java.util.UUID
+import javax.vecmath.Point3f
+import org.joml.Vector3f
+
+/**
+ * @author Willy KOUETE
+ * 
+ * This agent handles all the environment targetted event and requires the environment to performs the related action 
+ * Its initialization comes from the simulator it self
+ * 
+ */
+agent EnvironmentAgent {
+	
+	uses DefaultContextInteractions, Lifecycle, Schedules, Behaviors
+	
+	var  environment : DroneEnvironment
+	var espace : OpenEventSpace
+	var myAdr : Address
+	var leftSimulationLoop = 50000
+	var leftAgent = 0
+	var droneNum = 5
+	var buildingNum = 20
+	
+	var running = true
+	
+	on Initialize{
+		this.environment = (occurrence.parameters.get(0) as DroneEnvironment);
+
+		//generateObjects 
+		var spaceId = (occurrence.parameters.get(1) as UUID);
+		this.espace = defaultContext.getSpace(spaceId)
+		this.espace.register(asEventListener)
+		this.myAdr = this.espace.getAddress(ID) 
+		emit(new ReadyToStart)
+	}
+	
+
+	
+	on StartSimulation{
+		System.out.println("Starting simulation! ")
+		this.leftAgent = this.environment.droneBodies.size
+		run
+	}
+	
+	on InfluenceEmited{
+		if(running){
+			var bOut = occurrence.output
+			//System.out.println("\n\n-----------Influence received----------- ")
+			//System.out.println("\nMessage: "+occurrence.msg);
+			//System.out.println("\nDirection: "+bOut.linear);
+			//System.out.println("\nOrientation: "+bOut.angular);
+			var emiter = occurrence.emiter
+			//TODO : Apply influences here : this.environment.applyInfluences
+			bOut.manageInfluence(emiter)
+			//TODO: Send the EnvironmentChanges event to the GUI with the objects to render
+			run
+		}
+		
+	}
+	
+	def manageInfluence(bo:BehaviourOutput, e:UUID){
+		var mi = new MotionInfluence(bo.type, e, new Vector3f(bo.linear.x, bo.linear.y, bo.linear.z), bo.angular.lateralAngle, bo.angular.elevationAngle)
+		this.environment.getDroneBodyFor(e).influence(mi)
+	}
+	
+	def run{
+		var nbL = 0
+		synchronized(this){
+			if(this.leftSimulationLoop<=0){
+				running = false
+				stopSimulation
+			}
+			nbL = this.leftSimulationLoop--
+			//this.environment.applyPhysic();
+		}
+		if(running){
+			//System.out.println("Left simulation loop: "+ nbL)
+			
+			val simulTest = task("Simulation_Test") 
+			//simulTest.every(1000)[
+				this.environment.simulate
+				var delay = this.environment.timeManager.simulationDelay as long
+				if (delay > 0) {
+					Thread::sleep(delay)
+				}
+				notifyAgentsOrDie
+			//]
+		}
+	}	
+	
+	def stopSimulation{
+		var ^event = new StopSimulation
+		^event.source = this.myAdr
+		this.espace.emit(^event)
+	}
+	
+	def notifyAgentsOrDie {
+		var run = false
+		val timePercept = new TimePercept(
+			this.environment.timeManager.currentTime,
+			this.environment.timeManager.lastStepDuration)
+		for(body : this.environment.droneBodies) {
+			run = true
+			var ^event = new PerceptionEvent(
+				body.perceptions,
+				new Percept(body),
+				timePercept)
+			^event.source = this.myAdr
+			//System.out.println("Sending perception ")
+			this.espace.emit(^event, new AddressUUIDScope(body.id))
+		}
+		if (!run) {
+			killMe
+		}
+	}
+	
+	on AgentDead{
+		this.leftAgent--
+		if(this.leftAgent <= 0){
+			killMe
+		}
+	}
+}

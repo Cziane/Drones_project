@@ -1,0 +1,19 @@
+/.classpath
+/.project
+/META-INF/
+/ASM3.1/
+/asm-all-3.1.jar
+/default.bmp
+/graph libs/
+/models/
+/shaders/
+/textures/
+/javadoc/
+/jstackalloc/
+/lwjgl/
+/lwjgl32/
+/nblibraries.properties
+/stack-alloc.jar
+/swing-layout/
+/vecmath/
+/vecmath.jar

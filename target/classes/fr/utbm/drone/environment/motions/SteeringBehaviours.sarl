@@ -1,0 +1,193 @@
+package fr.utbm.info.vi51.motionbehavior
+
+import fr.utbm.drone.environment.DynamicType
+import fr.utbm.drone.environment.motions.AlignBehaviour
+import fr.utbm.drone.environment.motions.BehaviourOutput
+import fr.utbm.drone.environment.motions.EvadeBehaviour
+import fr.utbm.drone.environment.motions.FaceBehaviour
+import fr.utbm.drone.environment.motions.FleeBehaviour
+import fr.utbm.drone.environment.motions.PursueBehaviour
+import fr.utbm.drone.environment.motions.SeekBehaviour
+import fr.utbm.drone.environment.motions.WanderBehaviour
+import fr.utbm.drone.maths.Orientation3f
+import fr.utbm.drone.maths.Point3f
+import fr.utbm.drone.maths.Vector3f
+import java.util.Random
+
+class SteeringSeekBehaviour implements SeekBehaviour {
+
+	override runSeek(position : Point3f, linearSpeed : float, maxLinearAcceleration : float, target : Point3f) : BehaviourOutput {
+		val direction = target - position
+		direction.length = maxLinearAcceleration
+		return new BehaviourOutput(DynamicType.KINEMATIC) => [
+			linear = direction;
+		]
+	}
+	
+}
+
+class SteeringFleeBehaviour implements FleeBehaviour {
+
+	override runFlee(position : Point3f, linearSpeed : float, maxLinearAcceleration : float, target : Point3f) : BehaviourOutput {
+		val direction = position - target
+		direction.length = maxLinearAcceleration
+		return new BehaviourOutput(DynamicType.KINEMATIC) => [
+			linear = direction;
+		]
+	}
+	
+}
+
+class SteeringPursueBehaviour implements PursueBehaviour {
+
+	val seek : SteeringSeekBehaviour
+	val predictionDuration : float
+	
+	new(seek : SteeringSeekBehaviour, predictionDuration : float) {
+		this.seek = seek
+		this.predictionDuration = predictionDuration
+	}
+
+	override runPursue(position : Point3f, linearSpeed : float, maxLinearAcceleration : float,
+		targetPosition : Point3f, targetLinearMotion : Vector3f) : BehaviourOutput {
+		var seekTarget = targetPosition + targetLinearMotion * predictionDuration
+		return this.seek.runSeek(position, linearSpeed, maxLinearAcceleration, seekTarget);
+	}
+	
+}
+
+class SteeringEvadeBehaviour implements EvadeBehaviour {
+
+	val flee : SteeringFleeBehaviour
+	val predictionDuration : float
+	
+	new(flee: SteeringFleeBehaviour, predictionDuration : float) {
+		this.flee = flee
+		this.predictionDuration = predictionDuration
+	}
+
+	override runEvade(position : Point3f, linearSpeed : float, maxLinearAcceleration : float,
+		targetPosition : Point3f, targetLinearMotion : Vector3f) : BehaviourOutput {
+		var fleeTarget = targetPosition + targetLinearMotion * predictionDuration
+		return this.flee.runFlee(position, linearSpeed, maxLinearAcceleration, fleeTarget);
+	}
+	
+}
+
+class SteeringAlignBehaviour implements AlignBehaviour {
+
+	val stopAngle : float 
+	val decelerateAngle : float
+	val timeToReachTarget : float
+
+	new(stopAngle : float, decelerateAngle : float, timeToReachTarget : float) {
+		this.stopAngle = stopAngle
+		this.decelerateAngle = decelerateAngle
+		this.timeToReachTarget = timeToReachTarget
+	}
+	
+	override runAlign(orientation : Vector3f, angularSpeed : float, maxAngularAcceleration : float, target : Vector3f) : BehaviourOutput {
+		//val sAngle = orientation.signedAngle(target) // [-PI; PI]
+		val sAngle = Orientation3f.getOrientation(orientation.x, orientation.y, orientation.z, target.x, target.y, target.z)
+		val angleL = Math::abs(sAngle.lateralAngle) // [0; PI]
+		val angleE = Math::abs(sAngle.elevationAngle) // [0; PI]
+		var a = new Orientation3f()
+		if(angleL <= stopAngle || angleE <= stopAngle){
+			if (angleL <= stopAngle) {
+				a.lateralAngle = -angularSpeed / 1
+			}
+			
+			if (angleE <= stopAngle) {
+				a.elevationAngle = -angularSpeed / 1
+			}
+			val oa = a
+			return new BehaviourOutput(DynamicType::STEERING) => [
+				angular = oa
+			]
+		}
+		
+		if(angleL > decelerateAngle || angleE > decelerateAngle){
+			if (angleL > decelerateAngle) {
+				a.lateralAngle = Math::signum(sAngle.lateralAngle) * maxAngularAcceleration
+			}
+			
+			if (angleE > decelerateAngle) {
+				a.elevationAngle = Math::signum(sAngle.elevationAngle) * maxAngularAcceleration
+			}
+			val oa = a
+			return new BehaviourOutput(DynamicType::STEERING) => [
+				angular = oa
+			]
+		}
+		return new BehaviourOutput(DynamicType::STEERING) => [
+			angular = new Orientation3f((sAngle.lateralAngle / (timeToReachTarget**2)) as float, (sAngle.elevationAngle / (timeToReachTarget**2)) as float)
+		]
+	}
+	
+}
+
+class SteeringFaceBehaviour implements FaceBehaviour {
+
+	val align : SteeringAlignBehaviour
+	
+	new(align : SteeringAlignBehaviour) {
+		this.align = align
+	}
+
+	override runFace(position : Point3f, orientation : Vector3f, angularSpeed : float, maxAngularAcceleration : float, target : Point3f) : BehaviourOutput {
+		var alignTarget = target - position
+		return this.align.runAlign(orientation, angularSpeed, maxAngularAcceleration, alignTarget)
+	}
+	
+}
+
+class SteeringWanderBehaviour implements WanderBehaviour {
+
+	val circleDistance : float
+	val circleRadius : float
+	val maxRotation : float
+
+	val faceBehaviour : SteeringFaceBehaviour 
+	val seekBehaviour : SteeringSeekBehaviour 
+	
+	val random = new Random
+	
+	var rotation = 0f
+	
+	new(circleDistance : float, circleRadius : float, maxRotation : float, faceBehaviour : SteeringFaceBehaviour, seekBehaviour : SteeringSeekBehaviour) {
+		this.circleDistance = circleDistance
+		this.circleRadius = circleRadius
+		this.maxRotation = maxRotation
+		this.faceBehaviour = faceBehaviour
+		this.seekBehaviour = seekBehaviour
+	}
+
+	override runWander(position : Point3f, orientation : Vector3f, linearSpeed : float, maxLinearAcceleration : float,
+		angularSpeed : float, maxAngularAcceleration : float) : BehaviourOutput {
+		// Calculate the circle center
+		var circleCenter = orientation.toColinearVector(this.circleDistance)
+
+		// Calculate the displacement force
+		var displacement = circleCenter.toColinearVector(this.circleRadius)
+		displacement.turn(this.rotation)
+
+		// Change angle just a bit, so it
+		// won't have the same value in the
+		// next frame.
+		this.rotation += (this.random.nextFloat * 2f - 1f) * this.maxRotation
+
+		// Finally calculate the wander force
+		var circleCenterPosition = position + circleCenter
+		var faceTarget = circleCenterPosition + displacement
+
+		// Delegate
+		val faceOutput = this.faceBehaviour.runFace(position, orientation, angularSpeed, maxAngularAcceleration, faceTarget)
+		val seekOutput = this.seekBehaviour.runSeek(position, linearSpeed, maxLinearAcceleration, circleCenterPosition);
+
+		return new BehaviourOutput(DynamicType.KINEMATIC) => [
+			linear = seekOutput.linear;
+			angular = faceOutput.angular
+		]
+	}
+	
+}

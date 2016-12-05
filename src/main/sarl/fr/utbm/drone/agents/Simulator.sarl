@@ -1,0 +1,112 @@
+/**
+ * 
+ */
+package fr.utbm.drone.agents
+
+import fr.utbm.drone.^agent.DroneAgent
+import fr.utbm.drone.^agent.EnvironmentAgent
+import fr.utbm.drone.environment.DroneEnvironment
+import fr.utbm.drone.environment.ObjectType
+import fr.utbm.drone.events.AgentReady
+import fr.utbm.drone.events.ReadyToStart
+import fr.utbm.drone.events.StartSimulation
+import fr.utbm.drone.gui.DisplayManager
+import fr.utbm.drone.gui.IRenderEngine
+import fr.utbm.drone.gui.Scene
+import fr.utbm.drone.physics.PhysicEngine
+import fr.utbm.drone.time.StepTimeManager
+import io.sarl.core.DefaultContextInteractions
+import io.sarl.core.Initialize
+import io.sarl.core.Lifecycle
+import io.sarl.util.OpenEventSpaceSpecification
+import java.awt.image.BufferedImage
+import java.util.List
+import java.util.UUID
+import javax.imageio.ImageIO
+import javax.swing.JFileChooser
+import javax.swing.JOptionPane
+import javax.vecmath.Point3f
+
+/**
+ * @author Willy KOUETE 
+ *
+ */
+agent Simulator {
+	uses DefaultContextInteractions, Lifecycle
+	var waitingAgents = 0
+	var env : DroneEnvironment
+	var spaceId : UUID
+	var envId : UUID
+	var simuLogic : IRenderEngine
+	var graphicEngine : DisplayManager
+	 
+	on Initialize {
+		init()
+		spaceId = occurrence.parameters.get(0) as UUID
+		var espace = defaultContext.getOrCreateSpaceWithID(spaceId, OpenEventSpaceSpecification)
+	    envId = spawn( EnvironmentAgent, env, spaceId )
+	    simuLogic=new Scene();
+	    graphicEngine=new DisplayManager("Drone Simulator", 800, 600, true, simuLogic)
+	    graphicEngine.start()
+	    graphicEngine.updateItems(env.getAllObjects());
+	   
+	}
+	
+	on AgentReady[!occurrence.fromMe]{
+		synchronized(this) {
+			waitingAgents --
+			if (waitingAgents <= 0) {
+				System.out.println("Requiring simulation to start ")
+				emit(new StartSimulation)
+				killMe
+			}
+		}
+	}
+	on ReadyToStart{
+		 
+		System.out.println("Spawning Agents... ")
+	    waitingAgents = env.dronesNumber 
+	   
+	    var agentParameters : List<Object> = newArrayList(spaceId, envId)
+		
+		for(body : env.droneBodies) {
+			var agentType = DroneAgent
+			spawnInContextWithID(
+				agentType,
+				body.id,
+				defaultContext,
+				agentParameters.toArray)
+		}
+	}
+	
+ 	def  init(){
+ 		var  image:BufferedImage
+		var  mfChoose : JFileChooser = new JFileChooser();
+		JOptionPane.showMessageDialog(null,
+			    "Please Choose a BitMap For Environment",
+			    "Ok",
+			    JOptionPane.INFORMATION_MESSAGE)
+	 var returnVal = mfChoose.showDialog(null, "Bitmap Environment")
+	 if(returnVal != JFileChooser.APPROVE_OPTION ){
+			JOptionPane.showMessageDialog(null,
+				    "Default Environment will be generate.",
+				    "Ok",
+				    JOptionPane.WARNING_MESSAGE);
+			image = ImageIO.read(getClass().getResource("/default.bmp"));
+		}
+	else{
+			image = ImageIO.read(mfChoose.getSelectedFile());
+		} 
+		env = new DroneEnvironment(new StepTimeManager(500),image.getWidth()*16,image.getHeight()*16)
+		for (var x =0; x< image.getHeight();x++){
+			for(var z=0; z<image.getWidth();z++){
+				var pix= image.getRGB(x, z);
+				if(pix==-1){
+					env.generateObjects(ObjectType.BUILDING,new Point3f(x*16,0,z*16))
+				}
+			}
+		}
+		env.generateObjects(ObjectType.DRONE,new Point3f(16,100,16))
+		
+	}
+}

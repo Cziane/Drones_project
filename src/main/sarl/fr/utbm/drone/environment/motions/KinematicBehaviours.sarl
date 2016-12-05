@@ -1,0 +1,122 @@
+package fr.utbm.info.vi51.motionbehavior
+
+import fr.utbm.drone.environment.DynamicType
+import fr.utbm.drone.environment.motions.AlignBehaviour
+import fr.utbm.drone.environment.motions.BehaviourOutput
+import fr.utbm.drone.environment.motions.EvadeBehaviour
+import fr.utbm.drone.environment.motions.FaceBehaviour
+import fr.utbm.drone.environment.motions.FleeBehaviour
+import fr.utbm.drone.environment.motions.PursueBehaviour
+import fr.utbm.drone.environment.motions.SeekBehaviour
+import fr.utbm.drone.environment.motions.WanderBehaviour
+import fr.utbm.drone.maths.MathUtil
+import fr.utbm.drone.maths.Orientation3f
+import fr.utbm.drone.maths.Point3f
+import fr.utbm.drone.maths.Vector3f
+import java.util.Random
+
+class KinematicSeekBehaviour implements SeekBehaviour {
+
+	override runSeek(position : Point3f, linearSpeed : float, maxLinearSpeed : float, target : Point3f) : BehaviourOutput {
+		val direction = target - position
+		direction.length = maxLinearSpeed
+		return new BehaviourOutput(DynamicType.KINEMATIC) => [
+			linear = direction;
+		]
+	}
+	
+}
+
+class KinematicFleeBehaviour implements FleeBehaviour {
+
+	override runFlee(position : Point3f, linearSpeed : float, maxLinearSpeed : float, target : Point3f) : BehaviourOutput {
+		val direction = position - target
+		direction.length = maxLinearSpeed
+		return new BehaviourOutput(DynamicType.KINEMATIC) => [
+			linear = direction;
+		]
+	}
+	
+}
+
+class KinematicWanderBehaviour implements WanderBehaviour {
+
+	val random = new Random
+
+	override runWander(position : Point3f, orientation : Vector3f, linearSpeed : float, maxLinearSpeed : float,
+		angularSpeed : float, maxAngularSpeed : float) : BehaviourOutput {
+		val v = orientation.toColinearVector(maxLinearSpeed)
+	
+		val rotationL = this.random.nextGaussian() * maxAngularSpeed
+		val rotationE = this.random.nextGaussian() * maxAngularSpeed
+		
+		return new BehaviourOutput(DynamicType.KINEMATIC) => [
+			linear = v;
+			angular = new Orientation3f(rotationL as float, rotationE as float)
+		]
+	}
+	
+}
+
+class KinematicPursueBehaviour implements PursueBehaviour {
+
+	val seek : KinematicSeekBehaviour
+	val predictionDuration : float
+	
+	new(seek : KinematicSeekBehaviour, predictionDuration : float) {
+		this.seek = seek
+		this.predictionDuration = predictionDuration
+	}
+
+	override runPursue(position : Point3f, linearSpeed : float, maxLinearSpeed : float,
+		targetPosition : Point3f, targetLinearMotion : Vector3f) : BehaviourOutput {
+		var seekTarget = targetPosition + targetLinearMotion * predictionDuration
+		return this.seek.runSeek(position, linearSpeed, maxLinearSpeed, seekTarget);
+	}
+	
+}
+
+class KinematicEvadeBehaviour implements EvadeBehaviour {
+
+	val flee : KinematicFleeBehaviour
+	val predictionDuration : float
+	
+	new(flee: KinematicFleeBehaviour, predictionDuration : float) {
+		this.flee = flee
+		this.predictionDuration = predictionDuration
+	}
+
+	override runEvade(position : Point3f, linearSpeed : float, maxLinearSpeed : float,
+		targetPosition : Point3f, targetLinearMotion : Vector3f) : BehaviourOutput {
+		var fleeTarget = targetPosition + targetLinearMotion * predictionDuration
+		return this.flee.runFlee(position, linearSpeed, maxLinearSpeed, fleeTarget);
+	}
+	
+}
+
+class KinematicAlignBehaviour implements AlignBehaviour {
+
+	override runAlign(orientation : Vector3f, angularSpeed : float, maxAngularSpeed : float, target : Vector3f) : BehaviourOutput {
+		//val angle = orientation.signedAngle(target)
+		val angle = Orientation3f.getOrientation(orientation.x, orientation.y, orientation.z, target.x, target.y, target.z)
+		return new BehaviourOutput(DynamicType.KINEMATIC) => [
+			angular = new Orientation3f(MathUtil.clamp(angle.lateralAngle, -maxAngularSpeed, maxAngularSpeed), MathUtil.clamp(angle.elevationAngle, -maxAngularSpeed, maxAngularSpeed))
+		]
+	}
+	
+}
+
+class KinematicFaceBehaviour implements FaceBehaviour {
+
+	val align : KinematicAlignBehaviour
+	
+	new(align : KinematicAlignBehaviour) {
+		this.align = align
+	}
+
+	override runFace(position : Point3f, orientation : Vector3f, angularSpeed : float, maxAngularSpeed : float, target : Point3f) : BehaviourOutput {
+		var alignTarget = target - position
+		return this.align.runAlign(orientation, angularSpeed, maxAngularSpeed, alignTarget)
+	}
+	
+}

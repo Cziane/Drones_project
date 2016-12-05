@@ -1,0 +1,118 @@
+/**
+ * 
+ */
+package fr.utbm.drone.^agent
+
+import fr.utbm.drone.environment.DynamicType
+import fr.utbm.drone.environment.ObjectType
+import fr.utbm.drone.environment.Percept
+import fr.utbm.drone.environment.motions.BehaviourOutput
+import fr.utbm.drone.events.AgentDead
+import fr.utbm.drone.events.AgentReady
+import fr.utbm.drone.events.InfluenceEmited
+import fr.utbm.drone.events.PerceptionEvent
+import fr.utbm.drone.events.StopSimulation
+import fr.utbm.drone.maths.Orientation3f
+import fr.utbm.drone.maths.Point3f
+import fr.utbm.drone.maths.Vector3f
+import fr.utbm.drone.util.AddressUUIDScope
+import io.sarl.core.Behaviors
+import io.sarl.core.DefaultContextInteractions
+import io.sarl.core.Initialize
+import io.sarl.core.Lifecycle
+import io.sarl.lang.core.Address
+import io.sarl.util.OpenEventSpace
+import java.util.UUID
+
+/**
+ * @author perso
+ *
+ */
+agent DroneAgent {
+	uses DefaultContextInteractions, Lifecycle, Behaviors
+	
+	var target = new Point3f(230, 50f, 30.0f);
+	var myAdr : Address
+	var espace : OpenEventSpace
+	var envId : UUID
+	var body : Percept
+	var agonize = false
+	
+	on Initialize{		
+		var spaceId = (occurrence.parameters.get(0) as UUID);
+		this.envId = (occurrence.parameters.get(1) as UUID);
+		this.espace = defaultContext.getSpace(spaceId)
+		this.espace.register(asEventListener)
+		this.myAdr = this.espace.getAddress(ID)
+		System.out.println("Drone initialized! ")
+		emit(new AgentReady)
+	}
+	
+	on PerceptionEvent{		
+		//System.out.println("Drone Perceived! ")
+		body = occurrence.body
+		var vr = new Vector3f(0.0f, 0.0f, 0.0f);
+		var perceptions = occurrence.perceptions
+		var msg = "---------"+body.name+"----------\n"+
+					"Current Position: "+body.position+"\n"+
+					"Perceptions: \n"
+		for(o:perceptions){
+			if (o!=occurrence.body){
+			if (o.type == ObjectType.BUILDING || o.type == ObjectType.DRONE){
+				var x = o.position.x;
+				var y = o.position.y;
+				var z = o.position.z;
+				var repForce = new Vector3f(body.x-x, body.y-y, body.z-z);
+				repForce.length = (1/repForce.length()+1);
+				vr += repForce;
+			}else if(o.type == ObjectType.TARGET){
+			//	System.out.println("\nTarget Perceived! ")		
+				this.target = new Point3f(o.position.x, o.position.y, o.position.z)
+			}
+		}
+		}
+		// Attraction
+		var va = new Vector3f(target.x-body.x, target.y-body.y, target.z-body.z);
+		va.length = (va.length+1);
+		var y_motion=0.7*vr.y+0.3*va.y	
+		if((0.7*vr.y+0.3*va.y)<0){
+			y_motion=0.5f
+		}
+		val total = new Vector3f(0.7*vr.x+0.3*va.x, y_motion, 0.7*vr.z+0.3*va.z);
+		val direction = new Vector3f(body.direction.x, body.direction.y, body.direction.z);
+		//val angle = direction.signedAngle(total-direction);
+		var b = new BehaviourOutput(DynamicType.KINEMATIC) => [
+			linear = total;
+		]
+		var angle = Orientation3f.getOrientation(
+			direction.x, direction.y, direction.z, 
+			total.x, total.y, total.z
+		)
+		//System.out.println(angle)
+		//System.out.println("Position: "+body.position+" --- Target: "+target);
+		if(Math.abs(angle.lateralAngle)<=0.05f){
+			 angle.lateralAngle = 0.0f
+		}
+		if(Math.abs(angle.elevationAngle)<=0.005f){
+			 angle.elevationAngle = 0.0f
+		}
+		b.angular = angle;
+		
+		
+		
+		
+		var ^inf = new InfluenceEmited(b)
+		^inf.source=this.myAdr
+		^inf.emiter = body.ID
+		^inf.msg = msg
+		this.espace.emit(^inf, new AddressUUIDScope(this.envId))
+	}
+	
+	on StopSimulation{
+		System.out.println(body.name+" Dying... ")
+		var ^event = new AgentDead
+		^event.source = this.myAdr
+		this.espace.emit(^event, new AddressUUIDScope(this.envId))
+		killMe	
+	}
+}

@@ -1,0 +1,72 @@
+/**
+ * 
+ */
+package fr.utbm.drone.events
+
+import fr.utbm.drone.environment.AbstractEnvObject
+import fr.utbm.drone.environment.Percept
+import fr.utbm.drone.environment.motions.BehaviourOutput
+import fr.utbm.drone.time.TimePercept
+import io.sarl.lang.core.Address
+import java.util.List
+import java.util.UUID
+
+/**
+ * @author Willy KOUETE
+ *
+ */
+ 
+event ReadyToStart
+ 
+event StartSimulation
+
+event BuildPerception
+
+event PerceptionEvent { 
+	val body : Percept
+	val time : TimePercept
+	val perceptions : List<Percept>
+	new (p : List<Percept>, b : Percept, t : TimePercept) {
+		this.perceptions = p
+		this.body = b
+		this.time = t
+	}
+}
+
+event EnvironmentChanged{
+	var objects : List<AbstractEnvObject>
+	new(objects : List<AbstractEnvObject>){
+		this.objects = objects
+	}
+}
+
+event GUIWaiting{
+	var source:Address
+	new(source:Address){
+		this.source = source
+	}
+}
+
+event InfluenceInvent{
+	var behaviour : BehaviourOutput
+	new(bo:BehaviourOutput){
+		this.behaviour = bo
+	}
+}
+
+event InfluenceEmited{
+	var output : BehaviourOutput
+	var emiter : UUID
+	var msg : String
+	new(b:BehaviourOutput){
+		this.output = b
+	}
+}
+
+event AgentReady
+
+event WaitingForEnvironment
+
+event StopSimulation
+
+event AgentDead
