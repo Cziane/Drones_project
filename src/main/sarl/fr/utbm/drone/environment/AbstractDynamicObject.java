@@ -176,8 +176,8 @@ public abstract class AbstractDynamicObject extends AbstractEnvObject implements
 	 * @return the real motion.
 	 */
 	protected void move(Vector3f mov) {
-		System.out.println(mov);
-		this.body.setLinearMotion(new javax.vecmath.Vector3f(mov.x,mov.y,mov.z) );
+		//System.out.println(mov);
+		this.body.setLinearMotion(new javax.vecmath.Vector3f(mov.x,0,mov.z) );
 		this.body.setUpImpulsion(new javax.vecmath.Vector3f(0,mov.y,0));
 		/*// Ensure that the motion in inside the bounds of the world.
 		Vector3f r = new Vector3f(dx, dy, dz);

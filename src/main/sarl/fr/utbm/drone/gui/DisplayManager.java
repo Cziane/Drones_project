@@ -129,6 +129,7 @@ public class DisplayManager implements Runnable {
         			GuiItem graphObj=new DroneItem(obj.getBox().getWidth(), obj.getPosition().x, obj.getPosition().y, obj.getPosition().z);
         			graph.add(graphObj);
         			obj.setGraphi(graphObj);
+        			simLogic.setItemToFollow(graphObj);
         		}
         		
         	}

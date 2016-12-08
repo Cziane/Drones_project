@@ -7,6 +7,8 @@ import static org.lwjgl.glfw.GLFW.*;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.vecmath.Point3f;
+
 import fr.utbm.drone.gui.graph.PointLight;
 import fr.utbm.drone.gui.graph.items.Camera;
 import fr.utbm.drone.gui.graph.items.GuiItem;
@@ -23,6 +25,8 @@ public class Scene implements IRenderEngine {
     private final Camera camera;
 
     private List<GuiItem> GuiItems;
+    
+    private GuiItem  itemFollow;
 
     private Vector3f ambientLight;
 
@@ -84,7 +88,10 @@ public class Scene implements IRenderEngine {
     @Override
     public void update(float interval, MouseInput mouseInput) {
         // Update camera position
-        camera.movePosition(cameraInc.x * CAMERA_POS_STEP, cameraInc.y * CAMERA_POS_STEP, cameraInc.z * CAMERA_POS_STEP);
+    	if(itemFollow!=null){
+    		camera.setPosition(itemFollow.getPosition().x-10,itemFollow.getPosition().y+15, itemFollow.getPosition().z);
+    	}
+        
 
         // Update camera based on mouse            
         if (mouseInput.isRightButtonPressed()) {
@@ -104,6 +111,19 @@ public class Scene implements IRenderEngine {
         for (GuiItem GuiItem : GuiItems) {
             GuiItem.getMesh().cleanUp();
         }
+    }
+    
+ @Override
+public void setCamera(Vector3f pos) {
+	// TODO Auto-generated method stub
+	 this.camera.setPosition(pos.x, pos.y, pos.z);
+}
+    
+    @Override
+    public void setItemToFollow(GuiItem fo) {
+    	this.itemFollow=fo;
+    	this.setCamera(fo.getPosition());
+    	
     }
 
 	@Override
