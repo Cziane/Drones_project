@@ -8,6 +8,7 @@ import fr.utbm.drone.environment.ObjectType;
 import fr.utbm.drone.gui.graph.items.BuildingItem;
 import fr.utbm.drone.gui.graph.items.DroneItem;
 import fr.utbm.drone.gui.graph.items.GuiItem;
+import fr.utbm.drone.gui.graph.items.TargetItem;
 
 public class DisplayManager implements Runnable {
 
@@ -130,6 +131,11 @@ public class DisplayManager implements Runnable {
         			graph.add(graphObj);
         			obj.setGraphi(graphObj);
         			simLogic.setItemToFollow(graphObj);
+        		}
+        		else if(obj.getType()==ObjectType.TARGET){
+        			GuiItem graphObj=new TargetItem(obj.getBox().getWidth(), obj.getPosition().x, obj.getPosition().y, obj.getPosition().z);
+        			graph.add(graphObj);
+        			obj.setGraphi(graphObj);
         		}
         		
         	}

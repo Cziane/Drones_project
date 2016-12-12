@@ -1,10 +1,10 @@
 package fr.utbm.drone.gui;
 
 import fr.utbm.drone.environment.ObjectType;
-import fr.utbm.drone.gui.graph.items.BridgeItem;
 import fr.utbm.drone.gui.graph.items.BuildingItem;
 import fr.utbm.drone.gui.graph.items.DroneItem;
 import fr.utbm.drone.gui.graph.items.GuiItem;
+import fr.utbm.drone.gui.graph.items.TargetItem;
 
 public class RenderFactory {
 	
@@ -17,8 +17,8 @@ public class RenderFactory {
 			case BUILDING :
 				obj=new BuildingItem(scale, x, y, z);
 				break;
-			case BRIDGE :
-				obj=new BridgeItem(scale, x, y, z);
+			case TARGET:
+				obj=new TargetItem(scale, x, y, z);
 				break;
 			default :
 				throw new Exception();

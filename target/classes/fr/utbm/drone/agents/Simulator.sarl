@@ -92,7 +92,7 @@ agent Simulator {
 				    "Default Environment will be generate.",
 				    "Ok",
 				    JOptionPane.WARNING_MESSAGE);
-			image = ImageIO.read(getClass().getResource("/default.bmp"));
+			image = ImageIO.read(getClass().getResource("/default.bmp"))
 		}
 	else{
 			image = ImageIO.read(mfChoose.getSelectedFile());
@@ -107,6 +107,7 @@ agent Simulator {
 			}
 		}
 		env.generateObjects(ObjectType.DRONE,new Point3f(16,100,16))
+		env.generateObjects(ObjectType.TARGET, new Point3f(230, 50f, 30.0f))
 		
 	}
 }

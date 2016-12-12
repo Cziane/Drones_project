@@ -56,12 +56,13 @@ agent DroneAgent {
 		var msg = "---------"+body.name+"----------\n"+
 					"Current Position: "+body.position+"\n"+
 					"Perceptions: \n"
-		for(o:perceptions){
+		for (o : perceptions) {
 			if (o!=occurrence.body){
 			if (o.type == ObjectType.BUILDING || o.type == ObjectType.DRONE){
 				var x = o.position.x;
 				var y = o.position.y;
 				var z = o.position.z;
+				//repulsion
 				var repForce = new Vector3f(body.x-x, body.y-y, body.z-z);
 				repForce.length = (1/repForce.length()+1);
 				vr += repForce;

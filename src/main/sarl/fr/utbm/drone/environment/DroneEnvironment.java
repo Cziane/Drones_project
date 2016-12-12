@@ -17,6 +17,7 @@ import fr.utbm.drone.environment.influence.Influence;
 import fr.utbm.drone.environment.motions.MotionInfluence;
 import fr.utbm.drone.environment.object.Building;
 import fr.utbm.drone.environment.object.DroneBody;
+import fr.utbm.drone.environment.object.Target;
 import fr.utbm.drone.environment.storage.OcTree;
 import fr.utbm.drone.maths.Cube3f;
 import fr.utbm.drone.maths.Orientation3f;
@@ -368,7 +369,9 @@ public class DroneEnvironment {
 		physicController.stepSimulation(timeManager.getCurrentTime()/1000, 5);
 		for(AbstractEnvObject obj :allObjects){
 			obj.applyTransform();
-			obj.getPhysic().getBody().applyGravity();
+			if(!(obj instanceof Target)){
+				obj.getPhysic().getBody().applyGravity();
+			}
 		}
 	}
 
