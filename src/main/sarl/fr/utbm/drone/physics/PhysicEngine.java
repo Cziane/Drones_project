@@ -58,7 +58,7 @@ public class PhysicEngine {
 		this.physicWorld.removeRigidBody(obj.getBody());
 	}
 	
-	public void stepSimulation(float timeStep, int maxSubSteps){
+	public synchronized void stepSimulation(float timeStep, int maxSubSteps){
 		physicWorld.stepSimulation(timeStep, maxSubSteps);
 		
 	}

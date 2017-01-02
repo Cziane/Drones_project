@@ -42,7 +42,7 @@ agent EnvironmentAgent {
 	var  environment : DroneEnvironment
 	var espace : OpenEventSpace
 	var myAdr : Address
-	var leftSimulationLoop = 50000
+	var leftSimulationLoop = 500000000
 	var leftAgent = 0
 	var droneNum = 5
 	var buildingNum = 20
@@ -102,7 +102,7 @@ agent EnvironmentAgent {
 		if(running){
 			//System.out.println("Left simulation loop: "+ nbL)
 			
-			val simulTest = task("Simulation_Test") 
+			//val simulTest = task("Simulation_Test") 
 			//simulTest.every(1000)[
 				this.environment.simulate
 				var delay = this.environment.timeManager.simulationDelay as long

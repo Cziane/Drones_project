@@ -9,6 +9,7 @@ import org.joml.Vector3f;
 import fr.utbm.drone.environment.motions.MotionInfluence;
 import fr.utbm.drone.maths.MathUtil;
 import fr.utbm.drone.maths.Shape3f;
+import fr.utbm.drone.maths.Sphere3f;
 /*
  * The abstract representation of an agent body
  */
@@ -44,6 +45,7 @@ public abstract class AbstractAgentBody extends AbstractDynamicObject {
 	 * @return the frustum
 	 */
 	public Shape3f<?> getFrustum() {
+		this.frustum.setPosition(this.getPosition());
 		return frustum.clone();
 	}
 

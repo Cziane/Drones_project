@@ -113,4 +113,10 @@ public class Sphere3f extends Shape3f<Sphere3f> {
 	public String toString(){
 		return "(Center: "+this.center+" \nRadius: "+this.radius+")";
 	}
+
+	@Override
+	public void setPosition(Point3f nCenter) {
+		this.center=(Point3f)nCenter.clone();
+		
+	}
 }

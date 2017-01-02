@@ -103,6 +103,8 @@ public abstract class Shape3f<ST extends Shape3f<? super ST>> implements Cloneab
 	public abstract boolean intersects(Shape3f<?> s);
 
 	public abstract Cube3f getBox();
+	
+	public abstract void setPosition(Point3f nCenter);
 
 	public abstract ST translate(Vector3f r);
 

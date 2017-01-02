@@ -172,8 +172,10 @@ public class Simulator extends Agent {
       }
       Point3f _point3f = new Point3f(16, 100, 16);
       this.env.generateObjects(ObjectType.DRONE, _point3f);
-      Point3f _point3f_1 = new Point3f(230, 50f, 30.0f);
-      this.env.generateObjects(ObjectType.TARGET, _point3f_1);
+      Point3f _point3f_1 = new Point3f(200, 200, 200);
+      this.env.generateObjects(ObjectType.DRONE, _point3f_1);
+      Point3f _point3f_2 = new Point3f(230, 50f, 30.0f);
+      this.env.generateObjects(ObjectType.TARGET, _point3f_2);
     } catch (Throwable _e) {
       throw Exceptions.sneakyThrow(_e);
     }

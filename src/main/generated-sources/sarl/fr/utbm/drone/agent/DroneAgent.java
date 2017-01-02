@@ -84,7 +84,6 @@ public class DroneAgent extends Agent {
     this.target = null;
     this.haveTarget = false;
     this.dir = Direction.NORTH;
-    System.out.println("Drone initialized! ");
     DefaultContextInteractions _$CAPACITY_USE$IO_SARL_CORE_DEFAULTCONTEXTINTERACTIONS$CALLER_1 = this.$CAPACITY_USE$IO_SARL_CORE_DEFAULTCONTEXTINTERACTIONS == null ? (this.$CAPACITY_USE$IO_SARL_CORE_DEFAULTCONTEXTINTERACTIONS = getSkill(DefaultContextInteractions.class)) : this.$CAPACITY_USE$IO_SARL_CORE_DEFAULTCONTEXTINTERACTIONS;
     AgentReady _agentReady = new AgentReady();
     _$CAPACITY_USE$IO_SARL_CORE_DEFAULTCONTEXTINTERACTIONS$CALLER_1.emit(_agentReady);
@@ -95,8 +94,6 @@ public class DroneAgent extends Agent {
     this.body = occurrence.body;
     Vector3f vr = new Vector3f(0.0f, 0.0f, 0.0f);
     List<Percept> perceptions = occurrence.perceptions;
-    int _size = perceptions.size();
-    System.out.println(_size);
     String _name = this.body.getName();
     String _plus = ("---------" + _name);
     String _plus_1 = (_plus + "----------\n");

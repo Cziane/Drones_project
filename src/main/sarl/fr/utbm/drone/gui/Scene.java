@@ -121,7 +121,9 @@ public void setCamera(Vector3f pos) {
     
     @Override
     public void setItemToFollow(GuiItem fo) {
-    	this.itemFollow=fo;
+    	if(itemFollow==null){
+    		this.itemFollow=fo;	
+    	}
     	this.setCamera(fo.getPosition());
     	
     }

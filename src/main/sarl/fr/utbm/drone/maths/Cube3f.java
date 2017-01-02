@@ -177,4 +177,10 @@ public class Cube3f extends Shape3f<Cube3f> {
 		Cube3f b = box.getBox();
 		return contains(b.getLowerNearCorner()) && contains(b.getUpperFarCorner());
 	}
+
+	@Override
+	public void setPosition(Point3f nCenter) {
+		// TODO Auto-generated method stub
+		
+	}
 }

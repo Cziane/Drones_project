@@ -10,6 +10,7 @@ public abstract class GuiItem {
     private final Mesh mesh;
     
     private final Vector3f position;
+    private  Vector3f newPosition;
     
     private float scale;
 
@@ -19,6 +20,7 @@ public abstract class GuiItem {
         this.mesh = mesh;
         this.mesh.setMaterial(mat);
         position = new Vector3f(x, y, z);
+        newPosition = new Vector3f(x, y, z);
         this.scale = scale;
         rotation = new Vector3f(0, 0, 0);
     }
@@ -28,9 +30,9 @@ public abstract class GuiItem {
     }
 
     public void setPosition(float x, float y, float z) {
-        this.position.x = x;
-        this.position.y = y;
-        this.position.z = z;
+        this.newPosition.x = x;
+        this.newPosition.y = y;
+        this.newPosition.z = z;
     }
 
     public float getScale() {
@@ -39,6 +41,12 @@ public abstract class GuiItem {
 
     public void setScale(float scale) {
         this.scale = scale;
+    }
+    
+    public void refresh(){
+    	this.position.x = this.newPosition.x;
+        this.position.y = this.newPosition.y;
+        this.position.z = this.newPosition.z;
     }
 
     public Vector3f getRotation() {

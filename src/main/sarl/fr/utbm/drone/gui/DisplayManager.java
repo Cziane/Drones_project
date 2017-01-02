@@ -32,6 +32,7 @@ public class DisplayManager implements Runnable {
 
     public DisplayManager(String windowTitle, int width, int height, boolean vSync, IRenderEngine simLogic) throws Exception {
     	simuLoopThread = new Thread(this, "SIMU_LOOP_THREAD");
+    	this.simuLoopThread.setPriority(Thread.MAX_PRIORITY);
         window = new Window(windowTitle, width, height, vSync);
         mouseInput = new MouseInput();
         this.simLogic = simLogic;
@@ -66,7 +67,7 @@ public class DisplayManager implements Runnable {
         simLogic.init(window);
     }
 
-    protected void gameLoop() throws Exception {
+    protected  void gameLoop() throws Exception {
         float ellapsedTime;
         float accumulator = 0f;
         float interval = 1f / TARGET_UPS;
@@ -100,7 +101,7 @@ public class DisplayManager implements Runnable {
         double endTime = timer.getLastLoopTime() + loopSlot;
         while (timer.getTime() < endTime) {
             try {
-                Thread.sleep(1);
+                Thread.sleep(100);
             } catch (InterruptedException ie) {
             }
         }
@@ -118,6 +119,7 @@ public class DisplayManager implements Runnable {
     protected void refreshItems() throws Exception
     {
     	if(newItems){
+    		System.out.println("refresh");
     		LinkedList<GuiItem> graph= new LinkedList<GuiItem>();
         	for(AbstractEnvObject obj : items)
         	{

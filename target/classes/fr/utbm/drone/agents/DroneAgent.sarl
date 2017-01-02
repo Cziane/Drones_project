@@ -52,7 +52,7 @@ agent DroneAgent {
 		this.target=null;
 		this.haveTarget=false;
 		this.dir=Direction.NORTH;
-		System.out.println("Drone initialized! ")
+		//System.out.println("Drone initialized! ")
 		emit(new AgentReady)
 	}
 	
@@ -60,11 +60,12 @@ agent DroneAgent {
 		body = occurrence.body
 		var vr = new Vector3f(0.0f, 0.0f, 0.0f);
 		var perceptions = occurrence.perceptions
-		System.out.println(perceptions.size)
+		//System.out.println(perceptions.size)
 		var msg = "---------"+body.name+"----------\n"+
 					"Current Position: "+body.position+"\n"+
 					"Perceptions: \n"
 		for (o : perceptions) {
+			//System.out.println("   type : "+o.type)
 			if (o!=occurrence.body){
 			if (o.type == ObjectType.BUILDING || o.type == ObjectType.DRONE){
 				var x = o.position.x;

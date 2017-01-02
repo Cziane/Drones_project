@@ -156,5 +156,10 @@ public class Window {
     public void update() {
         glfwSwapBuffers(windowHandle);
         glfwPollEvents();
+        try{
+            Thread.sleep(100);
+            }catch (Exception e) {
+    			// TODO: handle exception
+    		}
     }
 }

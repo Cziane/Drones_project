@@ -41,7 +41,7 @@ public class DroneEnvironment {
 	private PhysicEngine physicController;
 	
 	public DroneEnvironment(TimeManager time, float width, float depth){
-		System.out.print("\nEnvironment: Width: "+width+" Height: "+height+" Depth: "+depth);
+		//System.out.print("\nEnvironment: Width: "+width+" Height: "+height+" Depth: "+depth);
 		this.width = width;
 		this.depth = depth;
 		this.timeManager = time;
@@ -168,6 +168,7 @@ public class DroneEnvironment {
 		Shape3f<?> f = agent.getFrustum();
 		List<AbstractEnvObject> perceived = (List<AbstractEnvObject>) storage.findPerceivedObjects(f);
 		List<Percept> perceptions = new ArrayList<>();
+		//System.out.println(perceived.size());
 		for(AbstractEnvObject o:perceived){
 			perceptions.add(new Percept(o));
 		}
@@ -369,7 +370,7 @@ public class DroneEnvironment {
 		physicController.stepSimulation(timeManager.getCurrentTime()/1000, 5);
 		for(AbstractEnvObject obj :allObjects){
 			obj.applyTransform();
-			if(!(obj instanceof Target)){
+			if((obj instanceof DroneBody)){
 				obj.getPhysic().getBody().applyGravity();
 			}
 		}

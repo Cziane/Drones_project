@@ -17,7 +17,6 @@ import fr.utbm.drone.maths.Vector3f;
 import fr.utbm.drone.time.TimeManager;
 import fr.utbm.drone.time.TimePercept;
 import fr.utbm.drone.util.AddressUUIDScope;
-import io.sarl.core.AgentTask;
 import io.sarl.core.Behaviors;
 import io.sarl.core.DefaultContextInteractions;
 import io.sarl.core.Initialize;
@@ -60,7 +59,7 @@ public class EnvironmentAgent extends Agent {
   
   protected Address myAdr;
   
-  protected int leftSimulationLoop = 50000;
+  protected int leftSimulationLoop = 500000000;
   
   protected int leftAgent = 0;
   
@@ -140,8 +139,6 @@ public class EnvironmentAgent extends Agent {
         nbL = _minusMinus;
       }
       if (this.running) {
-        Schedules _$CAPACITY_USE$IO_SARL_CORE_SCHEDULES$CALLER = this.$CAPACITY_USE$IO_SARL_CORE_SCHEDULES == null ? (this.$CAPACITY_USE$IO_SARL_CORE_SCHEDULES = getSkill(Schedules.class)) : this.$CAPACITY_USE$IO_SARL_CORE_SCHEDULES;
-        final AgentTask simulTest = _$CAPACITY_USE$IO_SARL_CORE_SCHEDULES$CALLER.task("Simulation_Test");
         this.environment.simulate();
         TimeManager _timeManager = this.environment.getTimeManager();
         float _simulationDelay = _timeManager.getSimulationDelay();

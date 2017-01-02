@@ -108,6 +108,7 @@ public class Renderer {
         mesh.render();
         // Render each gameItem
         for (GuiItem guiItem : guiItems) {
+        	guiItem.refresh();
             mesh = guiItem.getMesh();
             // Set model view matrix for this item
             modelViewMatrix = transformation.getModelViewMatrix(guiItem, viewMatrix);
@@ -118,6 +119,7 @@ public class Renderer {
         }
 
         shaderProgram.unbind();
+       
     }
 
     public void cleanup() {
