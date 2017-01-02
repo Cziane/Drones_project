@@ -56,27 +56,20 @@ agent Simulator {
 		synchronized(this) {
 			waitingAgents --
 			if (waitingAgents <= 0) {
-				System.out.println("Requiring simulation to start ")
+			//	System.out.println("Requiring simulation to start "+ waitingAgents)
 				emit(new StartSimulation)
 				killMe
-			}
 		}
+	}
+	
 	}
 	on ReadyToStart{
 		 
 		System.out.println("Spawning Agents... ")
-	    waitingAgents = env.dronesNumber 
+	    waitingAgents = env.dronesNumber
+		System.out.println("number bodies" + waitingAgents)
 	   
-	    var agentParameters : List<Object> = newArrayList(spaceId, envId)
-		
-		for(body : env.droneBodies) {
-			var agentType = DroneAgent
-			spawnInContextWithID(
-				agentType,
-				body.id,
-				defaultContext,
-				agentParameters.toArray)
-		}
+
 	}
 	
  	def  init(){
@@ -108,13 +101,17 @@ agent Simulator {
 		}
 		env.generateObjects(ObjectType.DRONE, new Point3f(16, 100, 16))
 		env.generateObjects(ObjectType.DRONE, new Point3f(200, 200, 200))
-		/* env.generateObjects(ObjectType.DRONE, new Point3f(16, 200, 16))
+		env.generateObjects(ObjectType.DRONE, new Point3f(16, 200, 16))
 		env.generateObjects(ObjectType.DRONE, new Point3f(32, 200, 32))
 		env.generateObjects(ObjectType.DRONE, new Point3f(16, 200, 32))
 		env.generateObjects(ObjectType.DRONE, new Point3f(32, 200, 16))
 		env.generateObjects(ObjectType.DRONE, new Point3f(32, 100, 16))
 		env.generateObjects(ObjectType.DRONE, new Point3f(16, 100, 32))
-		env.generateObjects(ObjectType.DRONE, new Point3f(100, 100, 100))*/
+		env.generateObjects(ObjectType.DRONE, new Point3f(100, 100, 100))
+		env.generateObjects(ObjectType.DRONE, new Point3f(32, 64, 28))
+		env.generateObjects(ObjectType.DRONE, new Point3f(64, 100, 64))
+		env.generateObjects(ObjectType.DRONE, new Point3f(64, 100, 32))
+		env.generateObjects(ObjectType.DRONE, new Point3f(32, 100, 64))
 		env.generateObjects(ObjectType.TARGET, new Point3f(230, 50f, 30.0f))
 		
 	}

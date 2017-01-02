@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" path="src/main/java"/>
 	<classpathentry kind="src" path="src/main/sarl"/>
 	<classpathentry kind="src" path="src/main/generated-sources/sarl">
 		<attributes>
@@ -9,16 +8,16 @@
 	</classpathentry>
 	<classpathentry kind="src" path="src/main/resources"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
-	<classpathentry kind="lib" path="D:/Documents/informatique/sarl/workspace/Drone_Project/src/DroneProjectLibs/lwjgl/jar/lwjgl.jar">
+	<classpathentry kind="lib" path="D:/Documents/Informatique/sarl/workspace/Drone_Project/src/DroneProjectLibs/lwjgl/jar/lwjgl.jar">
 		<attributes>
 			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="D:/Documents/informatique/sarl/workspace/Drone_Project/src/DroneProjectLibs/lwjgl/native"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="D:/Documents/informatique/sarl/workspace/Drone_Project/src/DroneProjectLibs/jbullet.jar"/>
-	<classpathentry kind="lib" path="D:/Documents/informatique/sarl/workspace/Drone_Project/src/DroneProjectLibs/joml-1.7.1.jar"/>
-	<classpathentry kind="lib" path="D:/Documents/informatique/sarl/workspace/Drone_Project/src/DroneProjectLibs/pngdecoder-1.0.jar"/>
-	<classpathentry kind="lib" path="D:/Documents/informatique/sarl/workspace/Drone_Project/src/DroneProjectLibs/stack-alloc.jar"/>
-	<classpathentry kind="lib" path="D:/Documents/informatique/sarl/workspace/Drone_Project/src/DroneProjectLibs/vecmath.jar"/>
-	<classpathentry kind="lib" path="D:/Documents/informatique/sarl/workspace/Drone_Project/src/DroneProjectLibs/io.janusproject.kernel-2.0.4.0-with-dependencies.jar"/>
+	<classpathentry kind="lib" path="D:/Documents/Informatique/sarl/workspace/Drone_Project/src/DroneProjectLibs/jbullet.jar"/>
+	<classpathentry kind="lib" path="D:/Documents/Informatique/sarl/workspace/Drone_Project/src/DroneProjectLibs/joml-1.7.1.jar"/>
+	<classpathentry kind="lib" path="D:/Documents/Informatique/sarl/workspace/Drone_Project/src/DroneProjectLibs/pngdecoder-1.0.jar"/>
+	<classpathentry kind="lib" path="D:/Documents/Informatique/sarl/workspace/Drone_Project/src/DroneProjectLibs/stack-alloc.jar"/>
+	<classpathentry kind="lib" path="D:/Documents/Informatique/sarl/workspace/Drone_Project/src/DroneProjectLibs/vecmath.jar"/>
+	<classpathentry kind="lib" path="D:/Documents/Informatique/sarl/workspace/Drone_Project/src/DroneProjectLibs/io.janusproject.kernel-2.0.4.0-with-dependencies.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

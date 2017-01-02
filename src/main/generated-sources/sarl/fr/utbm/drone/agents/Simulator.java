@@ -1,11 +1,9 @@
 package fr.utbm.drone.agents;
 
-import fr.utbm.drone.agent.DroneAgent;
 import fr.utbm.drone.agent.EnvironmentAgent;
 import fr.utbm.drone.environment.AbstractEnvObject;
 import fr.utbm.drone.environment.DroneEnvironment;
 import fr.utbm.drone.environment.ObjectType;
-import fr.utbm.drone.environment.object.DroneBody;
 import fr.utbm.drone.events.AgentReady;
 import fr.utbm.drone.events.ReadyToStart;
 import fr.utbm.drone.events.StartSimulation;
@@ -38,7 +36,6 @@ import javax.inject.Inject;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.vecmath.Point3f;
-import org.eclipse.xtext.xbase.lib.CollectionLiterals;
 import org.eclipse.xtext.xbase.lib.Exceptions;
 import org.eclipse.xtext.xbase.lib.Extension;
 import org.eclipse.xtext.xbase.lib.Inline;
@@ -91,7 +88,6 @@ public class Simulator extends Agent {
     synchronized (this) {
       this.waitingAgents--;
       if ((this.waitingAgents <= 0)) {
-        System.out.println("Requiring simulation to start ");
         DefaultContextInteractions _$CAPACITY_USE$IO_SARL_CORE_DEFAULTCONTEXTINTERACTIONS$CALLER = this.$CAPACITY_USE$IO_SARL_CORE_DEFAULTCONTEXTINTERACTIONS == null ? (this.$CAPACITY_USE$IO_SARL_CORE_DEFAULTCONTEXTINTERACTIONS = getSkill(DefaultContextInteractions.class)) : this.$CAPACITY_USE$IO_SARL_CORE_DEFAULTCONTEXTINTERACTIONS;
         StartSimulation _startSimulation = new StartSimulation();
         _$CAPACITY_USE$IO_SARL_CORE_DEFAULTCONTEXTINTERACTIONS$CALLER.emit(_startSimulation);
@@ -114,19 +110,7 @@ public class Simulator extends Agent {
     System.out.println("Spawning Agents... ");
     int _dronesNumber = this.env.getDronesNumber();
     this.waitingAgents = _dronesNumber;
-    List<Object> agentParameters = CollectionLiterals.<Object>newArrayList(this.spaceId, this.envId);
-    Iterable<DroneBody> _droneBodies = this.env.getDroneBodies();
-    for (final DroneBody body : _droneBodies) {
-      {
-        Class<DroneAgent> agentType = DroneAgent.class;
-        Lifecycle _$CAPACITY_USE$IO_SARL_CORE_LIFECYCLE$CALLER = this.$CAPACITY_USE$IO_SARL_CORE_LIFECYCLE == null ? (this.$CAPACITY_USE$IO_SARL_CORE_LIFECYCLE = getSkill(Lifecycle.class)) : this.$CAPACITY_USE$IO_SARL_CORE_LIFECYCLE;
-        UUID _id = body.getId();
-        DefaultContextInteractions _$CAPACITY_USE$IO_SARL_CORE_DEFAULTCONTEXTINTERACTIONS$CALLER = this.$CAPACITY_USE$IO_SARL_CORE_DEFAULTCONTEXTINTERACTIONS == null ? (this.$CAPACITY_USE$IO_SARL_CORE_DEFAULTCONTEXTINTERACTIONS = getSkill(DefaultContextInteractions.class)) : this.$CAPACITY_USE$IO_SARL_CORE_DEFAULTCONTEXTINTERACTIONS;
-        AgentContext _defaultContext = _$CAPACITY_USE$IO_SARL_CORE_DEFAULTCONTEXTINTERACTIONS$CALLER.getDefaultContext();
-        Object[] _array = agentParameters.toArray();
-        _$CAPACITY_USE$IO_SARL_CORE_LIFECYCLE$CALLER.spawnInContextWithID(agentType, _id, _defaultContext, _array);
-      }
-    }
+    System.out.println(("number bodies" + Integer.valueOf(this.waitingAgents)));
   }
   
   protected void init() {
@@ -174,8 +158,30 @@ public class Simulator extends Agent {
       this.env.generateObjects(ObjectType.DRONE, _point3f);
       Point3f _point3f_1 = new Point3f(200, 200, 200);
       this.env.generateObjects(ObjectType.DRONE, _point3f_1);
-      Point3f _point3f_2 = new Point3f(230, 50f, 30.0f);
-      this.env.generateObjects(ObjectType.TARGET, _point3f_2);
+      Point3f _point3f_2 = new Point3f(16, 200, 16);
+      this.env.generateObjects(ObjectType.DRONE, _point3f_2);
+      Point3f _point3f_3 = new Point3f(32, 200, 32);
+      this.env.generateObjects(ObjectType.DRONE, _point3f_3);
+      Point3f _point3f_4 = new Point3f(16, 200, 32);
+      this.env.generateObjects(ObjectType.DRONE, _point3f_4);
+      Point3f _point3f_5 = new Point3f(32, 200, 16);
+      this.env.generateObjects(ObjectType.DRONE, _point3f_5);
+      Point3f _point3f_6 = new Point3f(32, 100, 16);
+      this.env.generateObjects(ObjectType.DRONE, _point3f_6);
+      Point3f _point3f_7 = new Point3f(16, 100, 32);
+      this.env.generateObjects(ObjectType.DRONE, _point3f_7);
+      Point3f _point3f_8 = new Point3f(100, 100, 100);
+      this.env.generateObjects(ObjectType.DRONE, _point3f_8);
+      Point3f _point3f_9 = new Point3f(32, 64, 28);
+      this.env.generateObjects(ObjectType.DRONE, _point3f_9);
+      Point3f _point3f_10 = new Point3f(64, 100, 64);
+      this.env.generateObjects(ObjectType.DRONE, _point3f_10);
+      Point3f _point3f_11 = new Point3f(64, 100, 32);
+      this.env.generateObjects(ObjectType.DRONE, _point3f_11);
+      Point3f _point3f_12 = new Point3f(32, 100, 64);
+      this.env.generateObjects(ObjectType.DRONE, _point3f_12);
+      Point3f _point3f_13 = new Point3f(230, 50f, 30.0f);
+      this.env.generateObjects(ObjectType.TARGET, _point3f_13);
     } catch (Throwable _e) {
       throw Exceptions.sneakyThrow(_e);
     }

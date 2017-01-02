@@ -27,6 +27,7 @@ import java.util.Random
 import java.util.UUID
 import javax.vecmath.Point3f
 import org.joml.Vector3f
+import java.util.List
 
 /**
  * @author Willy KOUETE
@@ -41,6 +42,7 @@ agent EnvironmentAgent {
 	
 	var  environment : DroneEnvironment
 	var espace : OpenEventSpace
+	
 	var myAdr : Address
 	var leftSimulationLoop = 500000000
 	var leftAgent = 0
@@ -56,14 +58,22 @@ agent EnvironmentAgent {
 		var spaceId = (occurrence.parameters.get(1) as UUID);
 		this.espace = defaultContext.getSpace(spaceId)
 		this.espace.register(asEventListener)
-		this.myAdr = this.espace.getAddress(ID) 
+		this.myAdr = this.espace.getAddress(ID)
+		var agentParameters : List<Object> = newArrayList(spaceId, this.ID)
+
+		for (body : environment.droneBodies) {
+			var agentType = DroneAgent
+			spawnInContextWithID(agentType, body.id, defaultContext, agentParameters.toArray)
+			//System.out.println("--agent- ")
+		}
 		emit(new ReadyToStart)
+		
 	}
 	
 
 	
 	on StartSimulation{
-		System.out.println("Starting simulation! ")
+		//System.out.println("Starting simulation! ")
 		this.leftAgent = this.environment.droneBodies.size
 		run
 	}
@@ -71,7 +81,6 @@ agent EnvironmentAgent {
 	on InfluenceEmited{
 		if(running){
 			var bOut = occurrence.output
-			//System.out.println("\n\n-----------Influence received----------- ")
 			//System.out.println("\nMessage: "+occurrence.msg);
 			//System.out.println("\nDirection: "+bOut.linear);
 			//System.out.println("\nOrientation: "+bOut.angular);
@@ -91,6 +100,7 @@ agent EnvironmentAgent {
 	
 	def run{
 		var nbL = 0
+		//System.out.println("start");
 		synchronized(this){
 			if(this.leftSimulationLoop<=0){
 				running = false
@@ -100,8 +110,8 @@ agent EnvironmentAgent {
 			//this.environment.applyPhysic();
 		}
 		if(running){
-			//System.out.println("Left simulation loop: "+ nbL)
-			
+			synchronized(this){
+				
 			//val simulTest = task("Simulation_Test") 
 			//simulTest.every(1000)[
 				this.environment.simulate
@@ -109,8 +119,10 @@ agent EnvironmentAgent {
 				if (delay > 0) {
 					Thread::sleep(delay)
 				}
+			//System.out.println("Left simulation loop: " + nbL)
 				notifyAgentsOrDie
-			//]
+					// ]
+			}
 		}
 	}	
 	

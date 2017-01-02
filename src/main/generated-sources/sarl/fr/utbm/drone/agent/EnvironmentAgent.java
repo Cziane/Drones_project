@@ -1,5 +1,6 @@
 package fr.utbm.drone.agent;
 
+import fr.utbm.drone.agent.DroneAgent;
 import fr.utbm.drone.environment.DroneEnvironment;
 import fr.utbm.drone.environment.DynamicType;
 import fr.utbm.drone.environment.Percept;
@@ -38,6 +39,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 import javax.inject.Inject;
+import org.eclipse.xtext.xbase.lib.CollectionLiterals;
 import org.eclipse.xtext.xbase.lib.Exceptions;
 import org.eclipse.xtext.xbase.lib.Extension;
 import org.eclipse.xtext.xbase.lib.Inline;
@@ -85,6 +87,20 @@ public class EnvironmentAgent extends Agent {
     UUID _iD = this.getID();
     Address _address = this.espace.getAddress(_iD);
     this.myAdr = _address;
+    UUID _iD_1 = this.getID();
+    List<Object> agentParameters = CollectionLiterals.<Object>newArrayList(spaceId, _iD_1);
+    Iterable<DroneBody> _droneBodies = this.environment.getDroneBodies();
+    for (final DroneBody body : _droneBodies) {
+      {
+        Class<DroneAgent> agentType = DroneAgent.class;
+        Lifecycle _$CAPACITY_USE$IO_SARL_CORE_LIFECYCLE$CALLER = this.$CAPACITY_USE$IO_SARL_CORE_LIFECYCLE == null ? (this.$CAPACITY_USE$IO_SARL_CORE_LIFECYCLE = getSkill(Lifecycle.class)) : this.$CAPACITY_USE$IO_SARL_CORE_LIFECYCLE;
+        UUID _id = body.getId();
+        DefaultContextInteractions _$CAPACITY_USE$IO_SARL_CORE_DEFAULTCONTEXTINTERACTIONS$CALLER_1 = this.$CAPACITY_USE$IO_SARL_CORE_DEFAULTCONTEXTINTERACTIONS == null ? (this.$CAPACITY_USE$IO_SARL_CORE_DEFAULTCONTEXTINTERACTIONS = getSkill(DefaultContextInteractions.class)) : this.$CAPACITY_USE$IO_SARL_CORE_DEFAULTCONTEXTINTERACTIONS;
+        AgentContext _defaultContext_1 = _$CAPACITY_USE$IO_SARL_CORE_DEFAULTCONTEXTINTERACTIONS$CALLER_1.getDefaultContext();
+        Object[] _array = agentParameters.toArray();
+        _$CAPACITY_USE$IO_SARL_CORE_LIFECYCLE$CALLER.spawnInContextWithID(agentType, _id, _defaultContext_1, _array);
+      }
+    }
     DefaultContextInteractions _$CAPACITY_USE$IO_SARL_CORE_DEFAULTCONTEXTINTERACTIONS$CALLER_1 = this.$CAPACITY_USE$IO_SARL_CORE_DEFAULTCONTEXTINTERACTIONS == null ? (this.$CAPACITY_USE$IO_SARL_CORE_DEFAULTCONTEXTINTERACTIONS = getSkill(DefaultContextInteractions.class)) : this.$CAPACITY_USE$IO_SARL_CORE_DEFAULTCONTEXTINTERACTIONS;
     ReadyToStart _readyToStart = new ReadyToStart();
     _$CAPACITY_USE$IO_SARL_CORE_DEFAULTCONTEXTINTERACTIONS$CALLER_1.emit(_readyToStart);
@@ -92,7 +108,6 @@ public class EnvironmentAgent extends Agent {
   
   @SyntheticMember
   private void $behaviorUnit$StartSimulation$1(final StartSimulation occurrence) {
-    System.out.println("Starting simulation! ");
     Iterable<DroneBody> _droneBodies = this.environment.getDroneBodies();
     int _size = IterableExtensions.size(_droneBodies);
     this.leftAgent = _size;
@@ -139,14 +154,16 @@ public class EnvironmentAgent extends Agent {
         nbL = _minusMinus;
       }
       if (this.running) {
-        this.environment.simulate();
-        TimeManager _timeManager = this.environment.getTimeManager();
-        float _simulationDelay = _timeManager.getSimulationDelay();
-        long delay = ((long) _simulationDelay);
-        if ((delay > 0)) {
-          Thread.sleep(delay);
+        synchronized (this) {
+          this.environment.simulate();
+          TimeManager _timeManager = this.environment.getTimeManager();
+          float _simulationDelay = _timeManager.getSimulationDelay();
+          long delay = ((long) _simulationDelay);
+          if ((delay > 0)) {
+            Thread.sleep(delay);
+          }
+          this.notifyAgentsOrDie();
         }
-        this.notifyAgentsOrDie();
       }
     } catch (Throwable _e) {
       throw Exceptions.sneakyThrow(_e);
