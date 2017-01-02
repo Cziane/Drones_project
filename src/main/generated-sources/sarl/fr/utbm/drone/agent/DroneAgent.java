@@ -1,12 +1,14 @@
 package fr.utbm.drone.agent;
 
 import com.google.common.base.Objects;
+import fr.utbm.drone.environment.Direction;
 import fr.utbm.drone.environment.DynamicType;
 import fr.utbm.drone.environment.ObjectType;
 import fr.utbm.drone.environment.Percept;
 import fr.utbm.drone.environment.motions.BehaviourOutput;
 import fr.utbm.drone.events.AgentDead;
 import fr.utbm.drone.events.AgentReady;
+import fr.utbm.drone.events.FindTarget;
 import fr.utbm.drone.events.InfluenceEmited;
 import fr.utbm.drone.events.PerceptionEvent;
 import fr.utbm.drone.events.StopSimulation;
@@ -47,7 +49,9 @@ import org.eclipse.xtext.xbase.lib.Pure;
 @SarlSpecification("0.4")
 @SuppressWarnings("all")
 public class DroneAgent extends Agent {
-  protected Point3f target = new Point3f(230, 50f, 30.0f);
+  protected Point3f target;
+  
+  protected boolean haveTarget;
   
   protected Address myAdr;
   
@@ -58,6 +62,8 @@ public class DroneAgent extends Agent {
   protected Percept body;
   
   protected boolean agonize = false;
+  
+  protected Direction dir;
   
   @SyntheticMember
   private void $behaviorUnit$Initialize$0(final Initialize occurrence) {
@@ -75,6 +81,10 @@ public class DroneAgent extends Agent {
     UUID _iD = this.getID();
     Address _address = this.espace.getAddress(_iD);
     this.myAdr = _address;
+    this.target = null;
+    this.haveTarget = false;
+    Direction _randomDirection = Direction.randomDirection();
+    this.dir = _randomDirection;
     System.out.println("Drone initialized! ");
     DefaultContextInteractions _$CAPACITY_USE$IO_SARL_CORE_DEFAULTCONTEXTINTERACTIONS$CALLER_1 = this.$CAPACITY_USE$IO_SARL_CORE_DEFAULTCONTEXTINTERACTIONS == null ? (this.$CAPACITY_USE$IO_SARL_CORE_DEFAULTCONTEXTINTERACTIONS = getSkill(DefaultContextInteractions.class)) : this.$CAPACITY_USE$IO_SARL_CORE_DEFAULTCONTEXTINTERACTIONS;
     AgentReady _agentReady = new AgentReady();
@@ -127,46 +137,73 @@ public class DroneAgent extends Agent {
             javax.vecmath.Point3f _position_6 = o.getPosition();
             Point3f _point3f = new Point3f(_position_4.x, _position_5.y, _position_6.z);
             this.target = _point3f;
+            FindTarget _findTarget = new FindTarget(this.target);
+            this.espace.emit(_findTarget);
           }
         }
       }
     }
-    float _x_1 = this.target.getX();
-    float _x_2 = this.body.getX();
-    float _minus_3 = (_x_1 - _x_2);
-    float _y_1 = this.target.getY();
-    float _y_2 = this.body.getY();
-    float _minus_4 = (_y_1 - _y_2);
-    float _z_1 = this.target.getZ();
-    float _z_2 = this.body.getZ();
-    float _minus_5 = (_z_1 - _z_2);
-    Vector3f va = new Vector3f(_minus_3, _minus_4, _minus_5);
+    Vector3f va = new Vector3f();
+    if ((!this.haveTarget)) {
+      if (((((this.body.getX() < 4) || (this.body.getX() > 319)) || (this.body.getZ() < 4)) || (this.body.getZ() > 319))) {
+        Direction nDir = Direction.randomDirection();
+        while (Objects.equal(nDir, this.dir)) {
+          Direction _randomDirection = Direction.randomDirection();
+          nDir = _randomDirection;
+        }
+        this.dir = nDir;
+      }
+      float _x_1 = this.body.getX();
+      float _y_1 = this.body.getY();
+      float _z_1 = this.body.getZ();
+      Vector3f _vector3f = new Vector3f(_x_1, _y_1, _z_1);
+      Vector3f _vector3f_1 = new Vector3f(320, 400, 320);
+      final Vector3f point = this.dir.getPos(_vector3f, _vector3f_1);
+      float _x_2 = point.getX();
+      float _y_2 = point.getY();
+      float _z_2 = point.getZ();
+      Vector3f _vector3f_2 = new Vector3f(_x_2, _y_2, _z_2);
+      va = _vector3f_2;
+      System.out.println(this.body);
+    } else {
+      float _x_3 = this.target.getX();
+      float _x_4 = this.body.getX();
+      float _minus_3 = (_x_3 - _x_4);
+      float _y_3 = this.target.getY();
+      float _y_4 = this.body.getY();
+      float _minus_4 = (_y_3 - _y_4);
+      float _z_3 = this.target.getZ();
+      float _z_4 = this.body.getZ();
+      float _minus_5 = (_z_3 - _z_4);
+      Vector3f _vector3f_3 = new Vector3f(_minus_3, _minus_4, _minus_5);
+      va = _vector3f_3;
+    }
     float _length_1 = va.length();
     float _plus_6 = (_length_1 + 1);
     va.setLength(_plus_6);
-    float _y_3 = vr.getY();
-    double _multiply = (0.7 * _y_3);
-    float _y_4 = va.getY();
-    double _multiply_1 = (0.3 * _y_4);
-    double y_motion = (_multiply + _multiply_1);
     float _y_5 = vr.getY();
-    double _multiply_2 = (0.7 * _y_5);
+    double _multiply = (0.7 * _y_5);
     float _y_6 = va.getY();
-    double _multiply_3 = (0.3 * _y_6);
+    double _multiply_1 = (0.3 * _y_6);
+    double y_motion = (_multiply + _multiply_1);
+    float _y_7 = vr.getY();
+    double _multiply_2 = (0.7 * _y_7);
+    float _y_8 = va.getY();
+    double _multiply_3 = (0.3 * _y_8);
     double _plus_7 = (_multiply_2 + _multiply_3);
     boolean _lessThan = (_plus_7 < 0);
     if (_lessThan) {
       y_motion = 0.5f;
     }
-    float _x_3 = vr.getX();
-    double _multiply_4 = (0.7 * _x_3);
-    float _x_4 = va.getX();
-    double _multiply_5 = (0.3 * _x_4);
+    float _x_5 = vr.getX();
+    double _multiply_4 = (0.7 * _x_5);
+    float _x_6 = va.getX();
+    double _multiply_5 = (0.3 * _x_6);
     double _plus_8 = (_multiply_4 + _multiply_5);
-    float _z_3 = vr.getZ();
-    double _multiply_6 = (0.7 * _z_3);
-    float _z_4 = va.getZ();
-    double _multiply_7 = (0.3 * _z_4);
+    float _z_5 = vr.getZ();
+    double _multiply_6 = (0.7 * _z_5);
+    float _z_6 = va.getZ();
+    double _multiply_7 = (0.3 * _z_6);
     double _plus_9 = (_multiply_6 + _multiply_7);
     final Vector3f total = new Vector3f(_plus_8, y_motion, _plus_9);
     org.joml.Vector3f _direction = this.body.getDirection();
@@ -178,13 +215,13 @@ public class DroneAgent extends Agent {
       it.setLinear(total);
     };
     BehaviourOutput b = ObjectExtensions.<BehaviourOutput>operator_doubleArrow(_behaviourOutput, _function);
-    float _x_5 = direction.getX();
-    float _y_7 = direction.getY();
-    float _z_5 = direction.getZ();
-    float _x_6 = total.getX();
-    float _y_8 = total.getY();
-    float _z_6 = total.getZ();
-    Orientation3f angle = Orientation3f.getOrientation(_x_5, _y_7, _z_5, _x_6, _y_8, _z_6);
+    float _x_7 = direction.getX();
+    float _y_9 = direction.getY();
+    float _z_7 = direction.getZ();
+    float _x_8 = total.getX();
+    float _y_10 = total.getY();
+    float _z_8 = total.getZ();
+    Orientation3f angle = Orientation3f.getOrientation(_x_7, _y_9, _z_7, _x_8, _y_10, _z_8);
     float _lateralAngle = angle.getLateralAngle();
     float _abs = Math.abs(_lateralAngle);
     boolean _lessEqualsThan = (_abs <= 0.05f);
@@ -208,7 +245,17 @@ public class DroneAgent extends Agent {
   }
   
   @SyntheticMember
-  private void $behaviorUnit$StopSimulation$2(final StopSimulation occurrence) {
+  private void $behaviorUnit$FindTarget$2(final FindTarget occurrence) {
+    this.haveTarget = true;
+    float _x = occurrence.target.getX();
+    float _y = occurrence.target.getY();
+    float _z = occurrence.target.getZ();
+    Point3f _point3f = new Point3f(_x, _y, _z);
+    this.target = _point3f;
+  }
+  
+  @SyntheticMember
+  private void $behaviorUnit$StopSimulation$3(final StopSimulation occurrence) {
     String _name = this.body.getName();
     String _plus = (_name + " Dying... ");
     System.out.println(_plus);
@@ -278,7 +325,15 @@ public class DroneAgent extends Agent {
   private void $guardEvaluator$StopSimulation(final StopSimulation occurrence, final Collection<Runnable> ___SARLlocal_runnableCollection) {
     assert occurrence != null;
     assert ___SARLlocal_runnableCollection != null;
-    ___SARLlocal_runnableCollection.add(() -> $behaviorUnit$StopSimulation$2(occurrence));
+    ___SARLlocal_runnableCollection.add(() -> $behaviorUnit$StopSimulation$3(occurrence));
+  }
+  
+  @SyntheticMember
+  @PerceptGuardEvaluator
+  private void $guardEvaluator$FindTarget(final FindTarget occurrence, final Collection<Runnable> ___SARLlocal_runnableCollection) {
+    assert occurrence != null;
+    assert ___SARLlocal_runnableCollection != null;
+    ___SARLlocal_runnableCollection.add(() -> $behaviorUnit$FindTarget$2(occurrence));
   }
   
   @SyntheticMember

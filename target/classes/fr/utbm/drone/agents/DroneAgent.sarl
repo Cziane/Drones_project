@@ -23,6 +23,8 @@ import io.sarl.core.Lifecycle
 import io.sarl.lang.core.Address
 import io.sarl.util.OpenEventSpace
 import java.util.UUID
+import fr.utbm.drone.events.FindTarget
+import fr.utbm.drone.environment.Direction
 
 /**
  * @author perso
@@ -31,12 +33,15 @@ import java.util.UUID
 agent DroneAgent {
 	uses DefaultContextInteractions, Lifecycle, Behaviors
 	
-	var target = new Point3f(230, 50f, 30.0f);
+	var target : Point3f
+	var haveTarget: boolean
 	var myAdr : Address
 	var espace : OpenEventSpace
 	var envId : UUID
 	var body : Percept
 	var agonize = false
+	var dir: Direction
+	
 	
 	on Initialize{		
 		var spaceId = (occurrence.parameters.get(0) as UUID);
@@ -44,6 +49,9 @@ agent DroneAgent {
 		this.espace = defaultContext.getSpace(spaceId)
 		this.espace.register(asEventListener)
 		this.myAdr = this.espace.getAddress(ID)
+		this.target=null;
+		this.haveTarget=false;
+		this.dir=Direction.randomDirection();
 		System.out.println("Drone initialized! ")
 		emit(new AgentReady)
 	}
@@ -66,14 +74,29 @@ agent DroneAgent {
 				var repForce = new Vector3f(body.x-x, body.y-y, body.z-z);
 				repForce.length = (1/repForce.length()+1);
 				vr += repForce;
-			}else if(o.type == ObjectType.TARGET){
-			//	System.out.println("\nTarget Perceived! ")		
+			}else if(o.type == ObjectType.TARGET){	
 				this.target = new Point3f(o.position.x, o.position.y, o.position.z)
+				this.espace.emit(new FindTarget(this.target))
 			}
 		}
 		}
 		// Attraction
-		var va = new Vector3f(target.x-body.x, target.y-body.y, target.z-body.z);
+		var va = new Vector3f();
+		if (!this.haveTarget) {
+			if (body.x < 4 || body.x > 319 || body.z < 4 || body.z>319) {
+				var nDir=Direction.randomDirection();
+				while (nDir == this.dir) {
+					nDir = Direction.randomDirection();
+				}
+				this.dir=nDir;
+			}
+			val point = this.dir.getPos(new Vector3f(body.x, body.y, body.z), new Vector3f(320, 400, 320))
+			va = new Vector3f(point.getX(), point.getY(), point.getZ());
+			System.out.println(body);
+		}
+		else {
+			va = new Vector3f(target.x - body.x, target.y - body.y, target.z - body.z);
+		}
 		va.length = (va.length+1);
 		var y_motion=0.7*vr.y+0.3*va.y	
 		if((0.7*vr.y+0.3*va.y)<0){
@@ -107,6 +130,11 @@ agent DroneAgent {
 		^inf.emiter = body.ID
 		^inf.msg = msg
 		this.espace.emit(^inf, new AddressUUIDScope(this.envId))
+	}
+	
+	on FindTarget{
+		this.haveTarget=true;
+		this.target = new Point3f(occurrence.target.x,occurrence.target.y,occurrence.target.z)
 	}
 	
 	on StopSimulation{

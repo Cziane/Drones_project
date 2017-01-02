@@ -10,3 +10,17 @@
 /.StartSimulation.java._trace
 /.StopSimulation.java._trace
 /.WaitingForEnvironment.java._trace
+/.AllEvents.sarlbin
+/BuildPerception.java
+/PerceptionEvent.java
+/ReadyToStart.java
+/StartSimulation.java
+/AgentDead.java
+/AgentReady.java
+/EnvironmentChanged.java
+/GUIWaiting.java
+/InfluenceEmited.java
+/InfluenceInvent.java
+/StopSimulation.java
+/WaitingForEnvironment.java
+/.FindTarget.java._trace

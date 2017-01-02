@@ -12,3 +12,17 @@
 /.SteeringPursueBehaviour.java._trace
 /.SteeringSeekBehaviour.java._trace
 /.SteeringWanderBehaviour.java._trace
+/KinematicAlignBehaviour.java
+/KinematicEvadeBehaviour.java
+/KinematicFaceBehaviour.java
+/KinematicFleeBehaviour.java
+/KinematicPursueBehaviour.java
+/KinematicSeekBehaviour.java
+/KinematicWanderBehaviour.java
+/SteeringAlignBehaviour.java
+/SteeringEvadeBehaviour.java
+/SteeringFaceBehaviour.java
+/SteeringFleeBehaviour.java
+/SteeringPursueBehaviour.java
+/SteeringSeekBehaviour.java
+/SteeringWanderBehaviour.java

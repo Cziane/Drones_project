@@ -10,6 +10,7 @@ import fr.utbm.drone.time.TimePercept
 import io.sarl.lang.core.Address
 import java.util.List
 import java.util.UUID
+import fr.utbm.drone.maths.Point3f
 
 /**
  * @author Willy KOUETE
@@ -30,6 +31,15 @@ event PerceptionEvent {
 		this.perceptions = p
 		this.body = b
 		this.time = t
+	}
+}
+
+
+event FindTarget{
+	var target : Point3f
+	
+	new (targ :Point3f){
+		this.target = targ.clone
 	}
 }
 
