@@ -83,8 +83,7 @@ public class DroneAgent extends Agent {
     this.myAdr = _address;
     this.target = null;
     this.haveTarget = false;
-    Direction _randomDirection = Direction.randomDirection();
-    this.dir = _randomDirection;
+    this.dir = Direction.NORTH;
     System.out.println("Drone initialized! ");
     DefaultContextInteractions _$CAPACITY_USE$IO_SARL_CORE_DEFAULTCONTEXTINTERACTIONS$CALLER_1 = this.$CAPACITY_USE$IO_SARL_CORE_DEFAULTCONTEXTINTERACTIONS == null ? (this.$CAPACITY_USE$IO_SARL_CORE_DEFAULTCONTEXTINTERACTIONS = getSkill(DefaultContextInteractions.class)) : this.$CAPACITY_USE$IO_SARL_CORE_DEFAULTCONTEXTINTERACTIONS;
     AgentReady _agentReady = new AgentReady();
@@ -96,6 +95,8 @@ public class DroneAgent extends Agent {
     this.body = occurrence.body;
     Vector3f vr = new Vector3f(0.0f, 0.0f, 0.0f);
     List<Percept> perceptions = occurrence.perceptions;
+    int _size = perceptions.size();
+    System.out.println(_size);
     String _name = this.body.getName();
     String _plus = ("---------" + _name);
     String _plus_1 = (_plus + "----------\n");
@@ -145,26 +146,44 @@ public class DroneAgent extends Agent {
     }
     Vector3f va = new Vector3f();
     if ((!this.haveTarget)) {
-      if (((((this.body.getX() < 4) || (this.body.getX() > 319)) || (this.body.getZ() < 4)) || (this.body.getZ() > 319))) {
-        Direction nDir = Direction.randomDirection();
-        while (Objects.equal(nDir, this.dir)) {
-          Direction _randomDirection = Direction.randomDirection();
-          nDir = _randomDirection;
+      if (((this.body.getX() < 4) && Objects.equal(this.dir, Direction.SOUTH))) {
+        float _z_1 = this.body.getZ();
+        boolean _lessThan = (_z_1 < 4);
+        if (_lessThan) {
+          this.dir = Direction.EAST;
+        } else {
+          this.dir = Direction.WEST;
         }
-        this.dir = nDir;
+      } else {
+        if (((this.body.getX() > 319) && Objects.equal(this.dir, Direction.NORTH))) {
+          float _z_2 = this.body.getZ();
+          boolean _lessThan_1 = (_z_2 < 4);
+          if (_lessThan_1) {
+            this.dir = Direction.EAST;
+          } else {
+            this.dir = Direction.WEST;
+          }
+        } else {
+          if (((this.body.getX() > 319) && (Objects.equal(this.dir, Direction.EAST) || Objects.equal(this.dir, Direction.WEST)))) {
+            this.dir = Direction.SOUTH;
+          } else {
+            if (((this.body.getX() < 4) && (Objects.equal(this.dir, Direction.EAST) || Objects.equal(this.dir, Direction.WEST)))) {
+              this.dir = Direction.NORTH;
+            }
+          }
+        }
       }
       float _x_1 = this.body.getX();
       float _y_1 = this.body.getY();
-      float _z_1 = this.body.getZ();
-      Vector3f _vector3f = new Vector3f(_x_1, _y_1, _z_1);
+      float _z_3 = this.body.getZ();
+      Vector3f _vector3f = new Vector3f(_x_1, _y_1, _z_3);
       Vector3f _vector3f_1 = new Vector3f(320, 400, 320);
       final Vector3f point = this.dir.getPos(_vector3f, _vector3f_1);
       float _x_2 = point.getX();
       float _y_2 = point.getY();
-      float _z_2 = point.getZ();
-      Vector3f _vector3f_2 = new Vector3f(_x_2, _y_2, _z_2);
+      float _z_4 = point.getZ();
+      Vector3f _vector3f_2 = new Vector3f(_x_2, _y_2, _z_4);
       va = _vector3f_2;
-      System.out.println(this.body);
     } else {
       float _x_3 = this.target.getX();
       float _x_4 = this.body.getX();
@@ -172,9 +191,9 @@ public class DroneAgent extends Agent {
       float _y_3 = this.target.getY();
       float _y_4 = this.body.getY();
       float _minus_4 = (_y_3 - _y_4);
-      float _z_3 = this.target.getZ();
-      float _z_4 = this.body.getZ();
-      float _minus_5 = (_z_3 - _z_4);
+      float _z_5 = this.target.getZ();
+      float _z_6 = this.body.getZ();
+      float _minus_5 = (_z_5 - _z_6);
       Vector3f _vector3f_3 = new Vector3f(_minus_3, _minus_4, _minus_5);
       va = _vector3f_3;
     }
@@ -191,8 +210,8 @@ public class DroneAgent extends Agent {
     float _y_8 = va.getY();
     double _multiply_3 = (0.3 * _y_8);
     double _plus_7 = (_multiply_2 + _multiply_3);
-    boolean _lessThan = (_plus_7 < 0);
-    if (_lessThan) {
+    boolean _lessThan_2 = (_plus_7 < 0);
+    if (_lessThan_2) {
       y_motion = 0.5f;
     }
     float _x_5 = vr.getX();
@@ -200,10 +219,10 @@ public class DroneAgent extends Agent {
     float _x_6 = va.getX();
     double _multiply_5 = (0.3 * _x_6);
     double _plus_8 = (_multiply_4 + _multiply_5);
-    float _z_5 = vr.getZ();
-    double _multiply_6 = (0.7 * _z_5);
-    float _z_6 = va.getZ();
-    double _multiply_7 = (0.3 * _z_6);
+    float _z_7 = vr.getZ();
+    double _multiply_6 = (0.7 * _z_7);
+    float _z_8 = va.getZ();
+    double _multiply_7 = (0.3 * _z_8);
     double _plus_9 = (_multiply_6 + _multiply_7);
     final Vector3f total = new Vector3f(_plus_8, y_motion, _plus_9);
     org.joml.Vector3f _direction = this.body.getDirection();
@@ -217,11 +236,11 @@ public class DroneAgent extends Agent {
     BehaviourOutput b = ObjectExtensions.<BehaviourOutput>operator_doubleArrow(_behaviourOutput, _function);
     float _x_7 = direction.getX();
     float _y_9 = direction.getY();
-    float _z_7 = direction.getZ();
+    float _z_9 = direction.getZ();
     float _x_8 = total.getX();
     float _y_10 = total.getY();
-    float _z_8 = total.getZ();
-    Orientation3f angle = Orientation3f.getOrientation(_x_7, _y_9, _z_7, _x_8, _y_10, _z_8);
+    float _z_10 = total.getZ();
+    Orientation3f angle = Orientation3f.getOrientation(_x_7, _y_9, _z_9, _x_8, _y_10, _z_10);
     float _lateralAngle = angle.getLateralAngle();
     float _abs = Math.abs(_lateralAngle);
     boolean _lessEqualsThan = (_abs <= 0.05f);

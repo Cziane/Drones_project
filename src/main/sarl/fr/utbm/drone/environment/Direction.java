@@ -10,8 +10,8 @@ import fr.utbm.drone.maths.Vector3f;
 public enum Direction {
 	
 	NORTH(1,0,0),
-	SOUTH(0,0,0),
-	WEST(0,0,0),
+	SOUTH(-1,0,0),
+	WEST(0,0,-1),
 	EAST(0,0,1);
 	private final Vector3f dir;
 	private static final List<Direction> VALUES =
@@ -26,7 +26,7 @@ public enum Direction {
 		if(this == NORTH || this==SOUTH){
 			Vector3f result=this.dir.clone();
 			result.setX(result.getX()*limits.getX()-body.getX());
-			result.setY(limits.getY()/2-body.getY());
+			result.setY(limits.getY()/4-body.getY());
 			result.setZ(0);
 			return result;
 		}
@@ -34,7 +34,7 @@ public enum Direction {
 			Vector3f result=this.dir.clone();
 			result.setZ(result.getZ()*limits.getZ()-body.getZ());
 			result.setX(0);
-			result.setY(limits.getY()/2-body.getY());
+			result.setY(limits.getY()/4-body.getY());
 			return result;
 		}
 	}

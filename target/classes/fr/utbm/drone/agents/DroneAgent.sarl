@@ -51,16 +51,16 @@ agent DroneAgent {
 		this.myAdr = this.espace.getAddress(ID)
 		this.target=null;
 		this.haveTarget=false;
-		this.dir=Direction.randomDirection();
+		this.dir=Direction.NORTH;
 		System.out.println("Drone initialized! ")
 		emit(new AgentReady)
 	}
 	
 	on PerceptionEvent{		
-		//System.out.println("Drone Perceived! ")
 		body = occurrence.body
 		var vr = new Vector3f(0.0f, 0.0f, 0.0f);
 		var perceptions = occurrence.perceptions
+		System.out.println(perceptions.size)
 		var msg = "---------"+body.name+"----------\n"+
 					"Current Position: "+body.position+"\n"+
 					"Perceptions: \n"
@@ -83,16 +83,30 @@ agent DroneAgent {
 		// Attraction
 		var va = new Vector3f();
 		if (!this.haveTarget) {
-			if (body.x < 4 || body.x > 319 || body.z < 4 || body.z>319) {
-				var nDir=Direction.randomDirection();
-				while (nDir == this.dir) {
-					nDir = Direction.randomDirection();
+			if (body.x < 4 && this.dir==Direction.SOUTH) {
+				if(body.z<4){
+					this.dir=Direction.EAST
 				}
-				this.dir=nDir;
+				else{
+					this.dir=Direction.WEST
+				}
 			}
+			else if (body.x > 319 && this.dir == Direction.NORTH) {
+				if (body.z < 4) {
+					this.dir = Direction.EAST
+				} else {
+					this.dir = Direction.WEST
+				}
+			}
+			else if(body.x > 319 && (this.dir == Direction.EAST || this.dir==Direction.WEST)){
+				this.dir=Direction.SOUTH;
+			}
+			else if(body.x < 4 && (this.dir == Direction.EAST || this.dir == Direction.WEST)){
+				this.dir=Direction.NORTH;
+			}
+			
 			val point = this.dir.getPos(new Vector3f(body.x, body.y, body.z), new Vector3f(320, 400, 320))
 			va = new Vector3f(point.getX(), point.getY(), point.getZ());
-			System.out.println(body);
 		}
 		else {
 			va = new Vector3f(target.x - body.x, target.y - body.y, target.z - body.z);
