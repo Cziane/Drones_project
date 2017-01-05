@@ -90,6 +90,7 @@ public class DisplayManager implements Runnable {
                 sync();
             }
         }
+        System.exit(0);
     }
 
     protected void cleanup() {
