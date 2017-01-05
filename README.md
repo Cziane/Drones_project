@@ -13,8 +13,12 @@ This is a Drones Simulator created for Artificiall intelligence class.
 
 ##About Agent
 
-WIP
+Our drone agent should explore an unknow environement to find a target. Our agents have 2 behaviour. Their first behaviour is to exploring (like reactive agents ).
+When one of them find target he start communication with others to inform them of the target position.
+At this moment agent start a cognitif behaviour to rush the target.
 
 ##Contribution
 
-WIP
+	Clément Ziane
+	Willy Gael Kouete Gnoukouo
+	Mickael Rakotoarisoa
