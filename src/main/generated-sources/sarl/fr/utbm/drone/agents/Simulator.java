@@ -110,7 +110,6 @@ public class Simulator extends Agent {
     System.out.println("Spawning Agents... ");
     int _dronesNumber = this.env.getDronesNumber();
     this.waitingAgents = _dronesNumber;
-    System.out.println(("number bodies" + Integer.valueOf(this.waitingAgents)));
   }
   
   protected void init() {

@@ -32,7 +32,7 @@ public class DisplayManager implements Runnable {
 
     public DisplayManager(String windowTitle, int width, int height, boolean vSync, IRenderEngine simLogic) throws Exception {
     	simuLoopThread = new Thread(this, "SIMU_LOOP_THREAD");
-    	this.simuLoopThread.setPriority(Thread.MAX_PRIORITY);
+    	this.simuLoopThread.setPriority(Thread.MIN_PRIORITY);
         window = new Window(windowTitle, width, height, vSync);
         mouseInput = new MouseInput();
         this.simLogic = simLogic;
@@ -119,7 +119,6 @@ public class DisplayManager implements Runnable {
     protected void refreshItems() throws Exception
     {
     	if(newItems){
-    		System.out.println("refresh");
     		LinkedList<GuiItem> graph= new LinkedList<GuiItem>();
         	for(AbstractEnvObject obj : items)
         	{

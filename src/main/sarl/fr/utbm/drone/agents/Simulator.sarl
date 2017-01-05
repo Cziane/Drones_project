@@ -67,7 +67,6 @@ agent Simulator {
 		 
 		System.out.println("Spawning Agents... ")
 	    waitingAgents = env.dronesNumber
-		System.out.println("number bodies" + waitingAgents)
 	   
 
 	}
